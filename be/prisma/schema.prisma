@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id
+  nama_user     String
+  alamat        String
+  role          String
+  no_rekening   String
+  nama_rekening String
+  email         String       @unique
+  password      String
+  kendaraan     Kendaraan[]
+  pembayaran    Pembayaran[]
+  Perbaikan     Perbaikan[]
+}
+
+model Kendaraan {
+  id             String      @id
+  foto_kendaraan String
+  user           User        @relation(fields: [id_user], references: [id], onDelete: Cascade)
+  id_user        String
+  stnk           STNK        @relation(fields: [id_STNK], references: [id], onDelete: Cascade)
+  id_STNK        String      @unique
+  perbaikan      Perbaikan[]
+}
+
+model Perbaikan {
+  id                       String       @id
+  kendaraan                Kendaraan    @relation(fields: [id_kendaraan], references: [id])
+  id_kendaraan             String
+  no_spk                   String
+  perbaikan                String
+  user                     User         @relation(fields: [id_user_pemberi_perintah], references: [id])
+  id_user_pemberi_perintah String
+  total                    String
+  file_SPK                 String
+  pembayaran               Pembayaran[]
+}
+
+model STNK {
+  id           String      @id
+  no_stnk      String
+  nopol        String      @unique
+  masa_STNK    String
+  nomor_mesin  String
+  nomor_rangka String
+  status       String
+  foto_stnk    String
+  kendaraan    Kendaraan[]
+}
+
+model Pembayaran {
+  id                  String    @id
+  perbaikan           Perbaikan @relation(fields: [id_perbaikan], references: [id], onDelete: Cascade)
+  id_perbaikan        String
+  user                User      @relation(fields: [id_user], references: [id], onDelete: Cascade)
+  id_user             String
+  tanggal_dibuat      String
+  tanggal_jatuh_tempo String
+  nominal             String
+  status_pembayaran   String
+  file_invoice        String
+  no_invoice          String    @unique
+}
